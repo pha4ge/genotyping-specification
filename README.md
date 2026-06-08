@@ -1,4 +1,4 @@
-# The PHA4GE Genotyping Contextual Data Specification
+# The PHA4GE Microbial Genotyping Data Specification
 
   - [About](#about)
   - [Ontology based data specifications](#ontology-based-data-specifications)
