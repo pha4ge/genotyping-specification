@@ -1,0 +1,648 @@
+id: https://github.com/pha4ge/genotyping-specification/
+name: pha4ge_genotyping_specification
+title: PHA4GE Microbial Genotyping Contextual Data Specification
+description: >-
+  A standardized, machine-readable specification for communicating microbial
+  genotyping methods and results across laboratories. Developed by the PHA4GE
+  Data Structures Working Group.
+license: MIT
+version: 0.1.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  OBI: http://purl.obolibrary.org/obo/OBI_
+  GENEPIO: http://purl.obolibrary.org/obo/GENEPIO_
+  SO: http://purl.obolibrary.org/obo/SO_
+  NCBITaxon: http://purl.obolibrary.org/obo/NCBITaxon_
+
+default_range: string
+
+imports:
+  - linkml:types
+
+classes:
+  GenotypingRecord:
+    description: >-
+      A record capturing the method, schema, software, and result of a
+      microbial genotyping assay for a single organism.
+    slots:
+      - genotyping_method
+      - genotyping_schema_taxon
+      - genotyping_database_name
+      - genotyping_database_version
+      - genotyping_schema_name
+      - genotyping_software_name
+      - genotyping_software_version
+      - genotype
+      - genotype_confidence_value
+      - genotyping_details
+
+  GenotypingCollection:
+    description: A collection of genotyping records.
+    tree_root: true
+    attributes:
+      records:
+        range: GenotypingRecord
+        multivalued: true
+        inlined_as_list: true
+
+slots:
+  genotyping_method:
+    description: >-
+      A method which generates data about a genotype from a specimen of genomic
+      DNA. A variety of techniques and instruments can be used to produce
+      information about sequence variation at particular genomic positions.
+    slot_uri: OBI:0000435
+    range: GenotypingMethodMenu
+    required: true
+    comments:
+      - Select the method from the picklist. If the desired method is missing, submit a New Term Request.
+
+  genotyping_schema_taxon:
+    description: The taxon that the genotyping schema characterizes.
+    slot_uri: GENEPIO:0102163
+    range: GenotypingSchemaTaxonMenu
+    required: true
+    comments:
+      - Select the taxon from the picklist. If the desired taxon is missing, submit a New Term Request.
+
+  genotyping_database_name:
+    description: >-
+      The name of the database containing a set of allelic profiles and
+      sequences for genotyping.
+    slot_uri: GENEPIO:0102164
+    range: string
+    comments:
+      - Provide the name of the database containing the alleles and allele sequences.
+
+  genotyping_database_version:
+    description: >-
+      The version of the database containing a set of allelic profiles and
+      sequences for genotyping.
+    slot_uri: GENEPIO:0102165
+    range: string
+    comments:
+      - >-
+        Provide the database version. If a semantic version is unavailable
+        (e.g. x.y.z), provide the date of database download (or date of
+        database creation if the database is developed in-house).
+        Provide dates in ISO 8601 format (YYYY-MM-DD).
+
+  genotyping_schema_name:
+    description: >-
+      The name of the genotyping schema containing the traits (such as loci
+      and alleles) used to determine the genotype.
+    slot_uri: GENEPIO:0102166
+    range: string
+    comments:
+      - Include the schema name as provided by the database.
+
+  genotyping_software_name:
+    description: The name of the software used to determine the genotype.
+    slot_uri: GENEPIO:0102167
+    range: GenotypingSoftwareNameMenu
+    required: true
+    comments:
+      - >-
+        Select the name of the typing tool from the pick list. If the desired
+        tool is not in the list, submit a New Term Request.
+
+  genotyping_software_version:
+    description: The version number of the software used to determine the sequence type.
+    slot_uri: GENEPIO:0102168
+    range: string
+    comments:
+      - >-
+        Provide the software version. If a semantic version is unavailable
+        (e.g. x.y.z), provide the date of software release. Provide dates in
+        ISO 8601 format (YYYY-MM-DD).
+
+  genotype:
+    description: >-
+      The set of alleles and variants an individual carries in a particular
+      gene or gene locations.
+    slot_uri: SO:0001027
+    range: string
+    comments:
+      - >-
+        Provide the genotype as it is output from the typing software. Provide
+        the most granular type. Add any notes about how to interpret untypable
+        results or new sequence types in the "genotyping_details" field.
+
+  genotype_confidence_value:
+    description: The measure of confidence provided for a genotype call.
+    slot_uri: GENEPIO:0102169
+    range: string
+    comments:
+      - >-
+        Some software provides a confidence value for a genotyping result.
+        Different confidence scales are used across the community. Provide the
+        confidence value as it is output from the tool. Add any notes about
+        the confidence value in the "genotyping_details" field.
+
+  genotyping_details:
+    description: The details of the genotyping assay.
+    slot_uri: GENEPIO:0102170
+    range: string
+    comments:
+      - >-
+        Provide any extra information that may be useful for interpreting the
+        genotyping results such as citations, and explanations of notations
+        denoting new sequence types or untypable results.
+
+enums:
+  GenotypingMethodMenu:
+    description: Permissible values for the genotyping method field.
+    permissible_values:
+      target loci based typing:
+        description: Genotyping based on specific targeted loci.
+      MLST:
+        description: Multi-Locus Sequence Typing.
+      cgMLST:
+        description: Core genome Multi-Locus Sequence Typing.
+      wgMLST:
+        description: Whole genome Multi-Locus Sequence Typing.
+      rMLST:
+        description: Ribosomal Multi-Locus Sequence Typing.
+      plasmidMLST:
+        description: Plasmid Multi-Locus Sequence Typing.
+      segment based typing:
+        description: Genotyping based on genomic segments.
+      whole genome based typing:
+        description: Genotyping based on the whole genome.
+      SNP typing:
+        description: Genotyping based on single nucleotide polymorphisms.
+      phylogenetic typing:
+        description: Genotyping based on phylogenetic placement.
+      LINcode:
+        description: Life Identification Number coding for genotyping.
+      in silico serotyping:
+        description: Computational prediction of serotype from genome sequence.
+      In silico species detection:
+        description: Computational prediction of species from genome sequence.
+
+  GenotypingSoftwareNameMenu:
+    description: Permissible values for the genotyping software name field.
+    permissible_values:
+      ARIBA:
+        description: Antimicrobial Resistance Identification By Assembly (https://github.com/sanger-pathogens/ariba).
+      assembly_snptyper:
+        description: Assembly-based SNP typing tool (https://github.com/boasvdp/assembly_snptyper).
+      BIGSdb:
+        description: Bacterial Isolate Genome Sequence database typing software (https://github.com/kjolley/BIGSdb).
+      BPagST:
+        description: Bordetella pertussis agglutinogen sequence typing tool (https://pubmed.ncbi.nlm.nih.gov/35778384/).
+      BTyper3:
+        description: Bacillus cereus group in silico virulence and biovar typing tool (https://github.com/lmc297/BTyper3).
+      characterize_neisseria_capsule:
+        description: Tool for characterizing Neisseria capsule sequences (https://github.com/lmc297/BTyper3).
+      chewBBACA:
+        description: >-
+          A complete suite for gene-by-gene schema creation and strain
+          identification using whole-genome MLST (https://github.com/B-UMMI/chewBBACA).
+      CoreProfiler:
+        description: cgMLST profiling tool (https://gitlab.com/ifb-elixirfr/abromics/coreprofiler).
+      emm-typer:
+        description: emm gene typing tool for Streptococcus pyogenes (https://github.com/MDU-PHL/emmtyper).
+      FastMLST:
+        description: Fast multi-locus sequence typing tool (https://github.com/EnzoAndree/FastMLST).
+      GBS-SBG:
+        description: Group B Streptococcus serotype and sequence-based genotyping tool (https://github.com/swainechen/GBS-SBG).
+      hicap:
+        description: In silico serotyping of Haemophilus influenzae capsule locus (https://github.com/scwatts/hicap).
+      Kleborate:
+        description: Klebsiella pneumoniae genotyping and AMR screening tool (https://github.com/klebgenomics/Kleborate).
+      legsta:
+        description: Legionella pneumophila sequence-based typing tool (https://github.com/tseemann/legsta).
+      meningotype:
+        description: In silico serotyping of Neisseria meningitidis (https://github.com/MDU-PHL/meningotype).
+      MentaLiST:
+        description: MLST calling tool using efficient k-mer lookup (https://github.com/WGS-TB/MentaLiST).
+      MiST:
+        description: Rapid accurate (core-genome) mulit-locus sequence typing (https://github.com/BioinformaticsPlatformWIV-ISP/MiST).
+      mlst:
+        description: Scan contig files against PubMLST typing schemes (https://github.com/tseemann/mlst).
+      mykrobe:
+        description: Rapid antibiotic resistance genotyping and species typing tool (https://github.com/Mykrobe-tools/mykrobe).
+      PneumoKITy:
+        description: Pneumococcal capsular typing tool (https://github.com/CarmenSheppard/PneumoKITy).
+      pyMLST:
+        description: Python-based MLST tool using whole genome data (https://github.com/bvalot/pyMLST).
+      pyngoST:
+        description: Neisseria gonorrhoeae sequence typing tool (https://github.com/leosanbu/pyngoST).
+      "Ridom SeqSphere+":
+        description: Commercial cgMLST and wgMLST analysis software (https://www.ridom.de/seqsphere/).
+      SeqSero2:
+        description: Salmonella serotyping tool from whole genome sequencing data (https://github.com/denglab/SeqSero2).
+      ShigaTyper:
+        description: Shigella serotyping tool using whole genome sequencing data (https://github.com/cfsan-biostatistics/shigatyper).
+      SISTR:
+        description: Salmonella In Silico Typing Resource (https://github.com/phac-nml/sistr_cmd).
+      SpoTyping:
+        description: Fast and accurate in silico Mycobacterium spoligotyping (https://github.com/xiaeryu/SpoTyping).
+      srst2:
+        description: Short Read Sequence Typing for bacterial pathogens (https://github.com/katholt/srst2).
+      stringMLST:
+        description: Ultra-fast k-mer MLST typing tool (https://github.com/jordanlab/stringMLST).
+      TBProfiler:
+        description: Mycobacterium tuberculosis strain typing and drug resistance prediction tool (https://github.com/jodyphelan/TBProfiler).
+      Toxin:
+        description: Toxin gene typing tool (?).
+
+  GenotypingSchemaTaxonMenu:
+    description: >-
+      Permissible taxa for the genotyping schema taxon field. Values include
+      the taxon name and NCBI Taxonomy identifier where available.
+    permissible_values:
+      "Achromobacter [NCBITaxon:222]":
+        meaning: NCBITaxon:222
+      "Acinetobacter [NCBITaxon:469]":
+        meaning: NCBITaxon:469
+      "Acinetobacter baumannii [NCBITaxon:470]":
+        meaning: NCBITaxon:470
+      "Actinobacillus [NCBITaxon:713]":
+        meaning: NCBITaxon:713
+      "Aeromonas [NCBITaxon:642]":
+        meaning: NCBITaxon:642
+      "Aeromonas salmonicida [NCBITaxon:645]":
+        meaning: NCBITaxon:645
+      "Aggregatibacter actinomycetemcomitans [NCBITaxon:714]":
+        meaning: NCBITaxon:714
+      "Anaplasma phagocytophilum [NCBITaxon:948]":
+        meaning: NCBITaxon:948
+      "Arcobacter [NCBITaxon:28196]":
+        meaning: NCBITaxon:28196
+      "Aspergillus fumigatus [NCBITaxon:746128]":
+        meaning: NCBITaxon:746128
+      "Avibacterium paragallinarum [NCBITaxon:728]":
+        meaning: NCBITaxon:728
+      "Bacillus anthracis [NCBITaxon:1392]":
+        meaning: NCBITaxon:1392
+      "Bacillus cereus [NCBITaxon:1396]":
+        meaning: NCBITaxon:1396
+      "Bacillus licheniformis [NCBITaxon:1402]":
+        meaning: NCBITaxon:1402
+      "Bacillus subtilis [NCBITaxon:1423]":
+        meaning: NCBITaxon:1423
+      "Bacteroides fragilis [NCBITaxon:817]":
+        meaning: NCBITaxon:817
+      "Bartonella bacilliformis [NCBITaxon:774]":
+        meaning: NCBITaxon:774
+      "Bartonella henselae [NCBITaxon:38323]":
+        meaning: NCBITaxon:38323
+      "Bartonella washoeensis [NCBITaxon:186739]":
+        meaning: NCBITaxon:186739
+      "Blastocystis [NCBITaxon:12967]":
+        meaning: NCBITaxon:12967
+      "Bordetella [NCBITaxon:517]":
+        meaning: NCBITaxon:517
+      "Bordetella pertussis [NCBITaxon:520]":
+        meaning: NCBITaxon:520
+      "Brachyspira [NCBITaxon:29521]":
+        meaning: NCBITaxon:29521
+      "Brucella [NCBITaxon:234]":
+        meaning: NCBITaxon:234
+      "Brucella melitensis [NCBITaxon:29459]":
+        meaning: NCBITaxon:29459
+      "Burkholderia cepacia [NCBITaxon:292]":
+        meaning: NCBITaxon:292
+      "Burkholderia mallei [NCBITaxon:13373]":
+        meaning: NCBITaxon:13373
+      "Burkholderia pseudomallei [NCBITaxon:28450]":
+        meaning: NCBITaxon:28450
+      "Campylobacter [NCBITaxon:194]":
+        meaning: NCBITaxon:194
+      "Campylobacter coli [NCBITaxon:195]":
+        meaning: NCBITaxon:195
+      "Campylobacter jejuni [NCBITaxon:197]":
+        meaning: NCBITaxon:197
+      "Candida albicans [NCBITaxon:5476]":
+        meaning: NCBITaxon:5476
+      "Candida glabrata [NCBITaxon:5478]":
+        meaning: NCBITaxon:5478
+      "Candida krusei [NCBITaxon:4909]":
+        meaning: NCBITaxon:4909
+      "Candida tropicalis [NCBITaxon:5482]":
+        meaning: NCBITaxon:5482
+      "Carnobacterium maltaromaticum [NCBITaxon:2751]":
+        meaning: NCBITaxon:2751
+      "Chlamydiales [NCBITaxon:51291]":
+        meaning: NCBITaxon:51291
+      "Citrobacter [NCBITaxon:544]":
+        meaning: NCBITaxon:544
+      "Clonorchis sinensis [NCBITaxon:79923]":
+        meaning: NCBITaxon:79923
+      "Clostridioides [NCBITaxon:1870884]":
+        meaning: NCBITaxon:1870884
+      "Clostridioides difficile [NCBITaxon:1496]":
+        meaning: NCBITaxon:1496
+      "Clostridium [NCBITaxon:1485]":
+        meaning: NCBITaxon:1485
+      "Clostridium botulinum [NCBITaxon:1491]":
+        meaning: NCBITaxon:1491
+      "Clostridium chauvoei [NCBITaxon:46867]":
+        meaning: NCBITaxon:46867
+      "Clostridium perfringens [NCBITaxon:1502]":
+        meaning: NCBITaxon:1502
+      "Clostridium septicum [NCBITaxon:1504]":
+        meaning: NCBITaxon:1504
+      "Corynebacterium [NCBITaxon:1716]":
+        meaning: NCBITaxon:1716
+      "Corynebacterium diptheriae [NCBITaxon:1717]":
+        meaning: NCBITaxon:1717
+      "Corynebacterium pseudotuberculosis [NCBITaxon:1719]":
+        meaning: NCBITaxon:1719
+      "Cronobacter [NCBITaxon:413496]":
+        meaning: NCBITaxon:413496
+      "Cronobacter malonaticus [NCBITaxon:413503]":
+        meaning: NCBITaxon:413503
+      "Cronobacter sakazakii [NCBITaxon:28141]":
+        meaning: NCBITaxon:28141
+      "Cutibacterium acnes [NCBITaxon:1747]":
+        meaning: NCBITaxon:1747
+      "Dichelobacter nodosus [NCBITaxon:870]":
+        meaning: NCBITaxon:870
+      "Edwardsiella [NCBITaxon:635]":
+        meaning: NCBITaxon:635
+      "Enterobacter [NCBITaxon:547]":
+        meaning: NCBITaxon:547
+      "Enterobacter cloacae [NCBITaxon:550]":
+        meaning: NCBITaxon:550
+      "Enterobacter hormaechei [NCBITaxon:158836]":
+        meaning: NCBITaxon:158836
+      "Enterococcus [NCBITaxon:1350]":
+        meaning: NCBITaxon:1350
+      "Enterococcus faecium [NCBITaxon:1352]":
+        meaning: NCBITaxon:1352
+      "Enterococcus faecalis [NCBITaxon:1351]":
+        meaning: NCBITaxon:1351
+      "Enterococcus hirae [NCBITaxon:1354]":
+        meaning: NCBITaxon:1354
+      "Escherichia [NCBITaxon:561]":
+        meaning: NCBITaxon:561
+      "Escherichia coli [NCBITaxon:562]":
+        meaning: NCBITaxon:562
+      "Escherichia fergusonii [NCBITaxon:564]":
+        meaning: NCBITaxon:564
+      "Flavobacterium psychrophilum [NCBITaxon:96345]":
+        meaning: NCBITaxon:96345
+      "Francisella tularensis [NCBITaxon:263]":
+        meaning: NCBITaxon:263
+      "Gallibacterium anatis [NCBITaxon:750]":
+        meaning: NCBITaxon:750
+      "Geotrichum [NCBITaxon:43987]":
+        meaning: NCBITaxon:43987
+      "Glaessarella parasuis [NCBITaxon:738]":
+        meaning: NCBITaxon:738
+      "Haemophilus [NCBITaxon:724]":
+        meaning: NCBITaxon:724
+      "Haemophilus influenzae [NCBITaxon:727]":
+        meaning: NCBITaxon:727
+      "Helicobacter cinaedi [NCBITaxon:213]":
+        meaning: NCBITaxon:213
+      "Helicobacter pylori [NCBITaxon:210]":
+        meaning: NCBITaxon:210
+      "Helicobacter suis [NCBITaxon:104628]":
+        meaning: NCBITaxon:104628
+      "Influenza A virus [NCBITaxon:11320]":
+        meaning: NCBITaxon:11320
+      "Klebsiella [NCBITaxon:570]":
+        meaning: NCBITaxon:570
+      "Klebsiella aerogenes [NCBITaxon:548]":
+        meaning: NCBITaxon:548
+      "Klebsiella grimontii [NCBITaxon:2058152]":
+        meaning: NCBITaxon:2058152
+      "Klebsiella oxytoca [NCBITaxon:571]":
+        meaning: NCBITaxon:571
+      "Klebsiella michiganensis [NCBITaxon:1134687]":
+        meaning: NCBITaxon:1134687
+      "Klebsiella pasteurii [NCBITaxon:2587529]":
+        meaning: NCBITaxon:2587529
+      "Klebsiella pneumoniae [NCBITaxon:573]":
+        meaning: NCBITaxon:573
+      "Klebsiella pneumoniae subsp. pneumoniae [NCBITaxon:72407]":
+        meaning: NCBITaxon:72407
+      "Klebsiella quasipneumoniae [NCBITaxon:1463165]":
+        meaning: NCBITaxon:1463165
+      "Klebsiella variicola [NCBITaxon:244366]":
+        meaning: NCBITaxon:244366
+      "Kluyvera [NCBITaxon:579]":
+        meaning: NCBITaxon:579
+      "Kudoa septempunctata [NCBITaxon:751907]":
+        meaning: NCBITaxon:751907
+      "Lactobacillus salivarius [NCBITaxon:1624]":
+        meaning: NCBITaxon:1624
+      "Lactococcus garvieae [NCBITaxon:1363]":
+        meaning: NCBITaxon:1363
+      "Legionella [NCBITaxon:445]":
+        meaning: NCBITaxon:445
+      "Legionella pneumophila [NCBITaxon:446]":
+        meaning: NCBITaxon:446
+      "Leptospira [NCBITaxon:171]":
+        meaning: NCBITaxon:171
+      "Liberibacter solanacearum [NCBITaxon:556287]":
+        meaning: NCBITaxon:556287
+      "Listeria [NCBITaxon:1637]":
+        meaning: NCBITaxon:1637
+      "Listeria monocytogenes [NCBITaxon:1639]":
+        meaning: NCBITaxon:1639
+      "Macrococcus canis [NCBITaxon:1855823]":
+        meaning: NCBITaxon:1855823
+      "Macrococcus caseolyticus [NCBITaxon:69966]":
+        meaning: NCBITaxon:69966
+      "Mammaliicoccus sciuri [NCBITaxon:1296]":
+        meaning: NCBITaxon:1296
+      "Mannheimia haemolytica [NCBITaxon:75985]":
+        meaning: NCBITaxon:75985
+      "Melissococcus plutonius [NCBITaxon:33970]":
+        meaning: NCBITaxon:33970
+      "Moraxella [NCBITaxon:475]":
+        meaning: NCBITaxon:475
+      "Morganella morganii [NCBITaxon:582]":
+        meaning: NCBITaxon:582
+      "Mycobacteriaceae [NCBITaxon:1762]":
+        meaning: NCBITaxon:1762
+      "Mycobacterium [NCBITaxon:1763]":
+        meaning: NCBITaxon:1763
+      "Mycobacterium africanum [NCBITaxon:33894]":
+        meaning: NCBITaxon:33894
+      "Mycobacterium bovis [NCBITaxon:1765]":
+        meaning: NCBITaxon:1765
+      "Mycobacterium canetti [NCBITaxon:78331]":
+        meaning: NCBITaxon:78331
+      "Mycobacterium tuberculosis [NCBITaxon:1773]":
+        meaning: NCBITaxon:1773
+      "Mycobacterioides abscessus [NCBITaxon:36809]":
+        meaning: NCBITaxon:36809
+      "Mycoplasma agalactiae [NCBITaxon:2110]":
+        meaning: NCBITaxon:2110
+      "Mycoplasma anserisalpingitidis [NCBITaxon:519450]":
+        meaning: NCBITaxon:519450
+      "Mycoplasma bovis [NCBITaxon:28903]":
+        meaning: NCBITaxon:28903
+      "Mycoplasma flocculare [NCBITaxon:2128]":
+        meaning: NCBITaxon:2128
+      "Mycoplasma gallisepticum [NCBITaxon:2096]":
+        meaning: NCBITaxon:2096
+      "Mycoplasma genitalium [NCBITaxon:2097]":
+        meaning: NCBITaxon:2097
+      "Mycoplasma hominis [NCBITaxon:2098]":
+        meaning: NCBITaxon:2098
+      "Mycoplasma hypopneumoniae [NCBITaxon:2099]":
+        meaning: NCBITaxon:2099
+      "Mycoplasma hyorhinis [NCBITaxon:2100]":
+        meaning: NCBITaxon:2100
+      "Mycoplasma hyosynoviae [NCBITaxon: 29559]":
+        description: NCBITaxon:29559
+      "Mycoplasma iowae [NCBITaxon:2116]":
+        meaning: NCBITaxon:2116
+      "Mycoplasma pneumoniae [NCBITaxon:722438]":
+        meaning: NCBITaxon:722438
+      "Mycoplasma synoviae [NCBITaxon:2109]":
+        meaning: NCBITaxon:2109
+      "Neisseria [NCBITaxon:482]":
+        meaning: NCBITaxon:482
+      "Neisseria meningitidis [NCBITaxon:487]":
+        meaning: NCBITaxon:487
+      "Orientia tustsugamushi [NCBITaxon:784]":
+        meaning: NCBITaxon:784
+      "Ornithobacterium rhinotracheale [NCBITaxon:28251]":
+        meaning: NCBITaxon:28251
+      "Paenibacillus larvae [NCBITaxon:1464]":
+        meaning: NCBITaxon:1464
+      "Pasteurella multocida [NCBITaxon:747]":
+        meaning: NCBITaxon:747
+      "Pediococcus pentosaceus [NCBITaxon:1255]":
+        meaning: NCBITaxon:1255
+      "Photobacterium damselae [NCBITaxon:38293]":
+        meaning: NCBITaxon:38293
+      "Photorhabdus [NCBITaxon:29487]":
+        meaning: NCBITaxon:29487
+      "Piscirickettsia salmonis [NCBITaxon:1238]":
+        meaning: NCBITaxon:1238
+      "Porphyromonas gingivalis [NCBITaxon:837]":
+        meaning: NCBITaxon:837
+      "Proteus [NCBITaxon:583]":
+        meaning: NCBITaxon:583
+      "Proteus mirabilis [NCBITaxon:584]":
+        meaning: NCBITaxon:584
+      "Providencia stuartii [NCBITaxon:588]":
+        meaning: NCBITaxon:588
+      "Pseudomonas [NCBITaxon:286]":
+        meaning: NCBITaxon:286
+      "Pseudomonas aeruginosa [NCBITaxon:287]":
+        meaning: NCBITaxon:287
+      "Pseudomonas fluorescens [NCBITaxon:294]":
+        meaning: NCBITaxon:294
+      "Pseudomonas putida [NCBITaxon:303]":
+        meaning: NCBITaxon:303
+      "Rhodococcus anatipestifer [NCBITaxon:1827]":
+        meaning: NCBITaxon:1827
+      "Riemerella [NCBITaxon:34085]":
+        meaning: NCBITaxon:34085
+      "Salmonella [NCBITaxon:590]":
+        meaning: NCBITaxon:590
+      "Salmonella enterica [NCBITaxon:28901]":
+        meaning: NCBITaxon:28901
+      "Salmonella enterica subsp. enterica [NCBITaxon:59201]":
+        meaning: NCBITaxon:59201
+      "Saprolegnia parasitica [NCBITaxon:101203]":
+        meaning: NCBITaxon:101203
+      "Serratia [NCBITaxon:613]":
+        meaning: NCBITaxon:613
+      "Serratia marcescens [NCBITaxon:615]":
+        meaning: NCBITaxon:615
+      "Severe Acute Respiratory Syndrome Coronavirus 2 [NCBITaxon:2697049]":
+        meaning: NCBITaxon:2697049
+      "Shewanella [NCBITaxon:22]":
+        meaning: NCBITaxon:22
+      "Shigella [NCBITaxon:620]":
+        meaning: NCBITaxon:620
+      "Sinorhizobium [NCBITaxon:28105]":
+        meaning: NCBITaxon:28105
+      "Staphylococcus [NCBITaxon:1279]":
+        meaning: NCBITaxon:1279
+      "Staphylococcus argenteus [NCBITaxon:985002]":
+        meaning: NCBITaxon:985002
+      "Staphylococcus aureus [NCBITaxon:1280]":
+        meaning: NCBITaxon:1280
+      "Staphylococcus capitis [NCBITaxon:29388]":
+        meaning: NCBITaxon:29388
+      "Staphylococcus chromogenes [NCBITaxon:46126]":
+        meaning: NCBITaxon:46126
+      "Staphylococcus epidermis [NCBITaxon:1282]":
+        meaning: NCBITaxon:1282
+      "Staphylococcus haemolyticus [NCBITaxon:1283]":
+        meaning: NCBITaxon:1283
+      "Staphylococcus hominis [NCBITaxon:1290]":
+        meaning: NCBITaxon:1290
+      "Staphylococcus pseudintermedius [NCBITaxon:283734]":
+        meaning: NCBITaxon:283734
+      "Stenotrophomonas maltophilia [NCBITaxon:40324]":
+        meaning: NCBITaxon:40324
+      "Streptococcus [NCBITaxon:1301]":
+        meaning: NCBITaxon:1301
+      "Streptococcus agalactiae [NCBITaxon:1311]":
+        meaning: NCBITaxon:1311
+      "Streptococcus bovis [NCBITaxon:1335]":
+        meaning: NCBITaxon:1335
+      "Streptococcus canis [NCBITaxon:1329]":
+        meaning: NCBITaxon:1329
+      "Streptococcus dysgalactiae [NCBITaxon:1334]":
+        meaning: NCBITaxon:1334
+      "Streptococcus equinus [NCBITaxon:1335]":
+        meaning: NCBITaxon:1335
+      "Streptococcu gallolyticus [NCBITaxon:315405]":
+        meaning: NCBITaxon:315405
+      "Streptococcus iniae [NCBITaxon:1346]":
+        meaning: NCBITaxon:1346
+      "Streptococcus mitis [NCBITaxon:28037]":
+        meaning: NCBITaxon:28037
+      "Streptococcus pneumoniae [NCBITaxon:1313]":
+        meaning: NCBITaxon:1313
+      "Streptococcus pyogenes [NCBITaxon:1314]":
+        meaning: NCBITaxon:1314
+      "Streptococcus suis [NCBITaxon:1307]":
+        meaning: NCBITaxon:1307
+      "Streptococcu thermophilus [NCBITaxon:1308]":
+        meaning: NCBITaxon:1308
+      "Streptococcus uberis [NCBITaxon:1349]":
+        meaning: NCBITaxon:1349
+      "Streptococcus zooepidemicus [NCBITaxon:40041]":
+        meaning: NCBITaxon:40041
+      "Streptomyces [NCBITaxon:1883]":
+        meaning: NCBITaxon:1883
+      "Taylorella [NCBITaxon:29574]":
+        meaning: NCBITaxon:29574
+      "Tenacibaculum [NCBITaxon:104267]":
+        meaning: NCBITaxon:104267
+      "Treponema pallidum [NCBITaxon:160]":
+        meaning: NCBITaxon:160
+      "Trichomonas vaginalis [NCBITaxon:5722]":
+        meaning: NCBITaxon:5722
+      "Ureaplasma [NCBITaxon:2129]":
+        meaning: NCBITaxon:2129
+      "Vibrio [NCBITaxon:662]":
+        meaning: NCBITaxon:662
+      "Vibrio cholerae [NCBITaxon:666]":
+        meaning: NCBITaxon:666
+      "Vibrio parahaemolyticus [NCBITaxon:670]":
+        meaning: NCBITaxon:670
+      "Vibrio tapetis [NCBITaxon:52443]":
+        meaning: NCBITaxon:52443
+      "Vibrio vulnificus [NCBITaxon:672]":
+        meaning: NCBITaxon:672
+      "Wolbachia [NCBITaxon:953]":
+        meaning: NCBITaxon:953
+      "Xanthomonas citri [NCBITaxon:346]":
+        meaning: NCBITaxon:346
+      "Xylella fastidiosa [NCBITaxon:2371]":
+        meaning: NCBITaxon:2371
+      "Yersinia [NCBITaxon:629]":
+        meaning: NCBITaxon:629
+      "Yersinia enterocolitica [NCBITaxon:630]":
+        meaning: NCBITaxon:630
+      "Yersinia pseudotuberculosis [NCBITaxon:1649845]":
+        meaning: NCBITaxon:1649845
+      "Yersinia ruckeri [NCBITaxon:29486]":
+        meaning: NCBITaxon:29486
